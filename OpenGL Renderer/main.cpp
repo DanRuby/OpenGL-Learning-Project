@@ -78,15 +78,20 @@ void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
     camera.ProcessMouseScroll(yOffset);
 }
 
+void set_input_callbacks(GLFWwindow* window) {
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+}
+
 int main(void)
 {
     GLFWwindow* window;
 
-    /* Initialize the library */
     if (!glfwInit())
         return -1;
 
-    /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(screenSize.x, screenSize.y, "Voxel Engine", NULL, NULL);
     if (!window)
     {
@@ -95,16 +100,10 @@ int main(void)
         return -1;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    set_input_callbacks(window);
 
-    /*Setting callbacks*/
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
 
-    /*Check if glad is initialised*/
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -161,24 +160,24 @@ int main(void)
 
     glm::vec3 dirLightPos = glm::vec3(3.0f, 0.0f, 0.0f);
 
-    //glm::vec3 cubePositions[] =
-    //{
-    //    glm::vec3(0.0f,  0.0f,  0.0f),
-    //    glm::vec3(2.0f,  5.0f, -15.0f),
-    //    glm::vec3(-1.5f, -2.2f, -2.5f),
-    //    glm::vec3(-3.8f, -2.0f, -12.3f),
-    //    glm::vec3(2.4f, -0.4f, -3.5f),
-    //    glm::vec3(-1.7f,  3.0f, -7.5f),
-    //    glm::vec3(1.3f, -2.0f, -2.5f),
-    //    glm::vec3(1.5f,  2.0f, -2.5f),
-    //    glm::vec3(1.5f,  0.2f, -1.5f),
-    //    glm::vec3(-1.3f,  1.0f, -1.5f)
-    //};
+    glm::vec3 cubePositions[] =
+    {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
 
     /*Binding VAOs and VBOs-------------------------------------------------------*/
-    //unsigned int VAO;
-    //glGenVertexArrays(1, &VAO);
-    //glBindVertexArray(VAO);
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);
@@ -249,15 +248,14 @@ int main(void)
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
         object.Draw(litShader);
-        //objectsDrawing
-        //for (int i = 0; i < 10; i++)
-        //{
-        //    glm::mat4 modelCube = glm::mat4(1.0f);
-        //    modelCube = glm::translate(modelCube, cubePositions[i]);
-        //    float angle = 20.0f * i;
-        //    modelCube = glm::rotate(modelCube, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        //    DrawCube(litShader, VAO, modelCube, view, projection);
-        //}
+        for (int i = 0; i < 10; i++)
+        {
+            glm::mat4 modelCube = glm::mat4(1.0f);
+            modelCube = glm::translate(modelCube, cubePositions[i]);
+            float angle = 20.0f * i;
+            modelCube = glm::rotate(modelCube, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            DrawCube(litShader, VAO, modelCube, view, projection);
+        }
 
         //lightDrawing
         for (int i = 0; i < 4; i++)
@@ -276,9 +274,9 @@ int main(void)
         glfwPollEvents();
     }
 
-    //glDeleteVertexArrays(1, &VAO);
-    //glDeleteVertexArrays(1, &lightVAO);
-    //glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &lightVAO);
+    glDeleteBuffers(1, &VBO);
     glfwTerminate();
     return 0;
 }
